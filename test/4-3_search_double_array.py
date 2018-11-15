@@ -10,16 +10,19 @@ check = [None, 0, 1, 1, 1, 2, 3, 4, 2, 8, 4, 7, 11, 10]
 
 def search(search_str):
     result = {}
-    src = 1
+    src = 1 # インデックスは１から開始
+
+    # １文字ずつ共通接頭辞を探していく
     for i, c in enumerate(search_str):
         dst = base[src] + code[c]
         parent = check[dst]
-        if src == parent:
-            src = dst
 
-            dst = base[src] + code['#']
+        # 親から子への遷移として正しい？
+        if src == parent:
+            src = dst # 子ノードに移動
+            dst = base[src] + code['#'] # 終端確認
             parent = check[dst]
-            if src == parent:
+            if src == parent: # 終端ノードであれば検索結果に追加
                 result[search_str[:i+1]] = -base[dst]
 
     return result
@@ -30,11 +33,13 @@ test_str_list = [
     'ac',
     'b',
     'cab',
-    'cd'
+    'cd',
+    'aa',
+    'cb',
+    'd'
 ]
-
 
 for test in test_str_list:
     result = search(test)
-    print('Search: %s'.format(test))
+    print('Search: "{}"'.format(test))
     print(result)
