@@ -33,7 +33,9 @@ def main():
     args = parser.parse_args()
 
     da = DoubleArray()
+    build_begin_time = time.time()
     build(da, args.vocab)
+    print('Building time of your double-array: {:.1f}s'.format(time.time() - build_begin_time))
 
     sample_query_list = ['東', '東京', '東京タワー', '東京都議会', '別個']
     for q in sample_query_list:
