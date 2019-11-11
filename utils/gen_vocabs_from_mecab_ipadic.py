@@ -1,4 +1,11 @@
-"""Generate a vocabulary file from ipadic"""
+"""Generate a vocabulary file from ipadic
+
+Generated word_list file is like below:
+東京
+東京都
+桜
+犬
+"""
 
 import argparse
 import codecs
@@ -11,8 +18,8 @@ def main():
     begin_time = time.time()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--ipadic_dir', type=str, metavar='PATH', default='./utils/mecab-ipadic-2.7.0-20070801', help='mecab ipadic dir')
-    parser.add_argument('--out', type=str, metavar='PATH', default='./utils/ipadic-vocab.txt', help='output filename')
+    parser.add_argument('--ipadic_dir', type=str, metavar='PATH', default='./data/mecab-ipadic-2.7.0-20070801/', help='mecab ipadic dir')
+    parser.add_argument('--out', type=str, metavar='PATH', default='./data/ipadic-words.txt', help='output filename')
     args = parser.parse_args()
 
     # get all the csv files in that directory (assuming they have the extension .csv)
