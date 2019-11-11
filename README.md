@@ -17,8 +17,15 @@ python build.py
 ```
 
 ## サンプルの実行
+最小コスト法による結果と最長一致法による結果が表示されます．`-q`オプションを入れない場合，標準入力で文を入力できます．
 ```
 python examples/run_tokenizer.py -q 吾輩は猫である
+Loading dictionaries...
+Loaded!
+Input: 吾輩は猫である
+Tokens (min cost): [('__BOS__', None), ('吾輩', '名詞'), ('は', '助詞'), ('猫', '名詞'), ('で', '助動詞'), ('ある', '助動詞'), ('__EOS__', None)]
+Tokens (longest match): ['吾輩', 'は', '猫', 'で', 'ある']
+
 ```
 
 
