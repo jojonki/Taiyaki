@@ -1,6 +1,7 @@
 """Taiyaki class"""
 import copy
 import os
+import sys
 import warnings
 
 from cost_manager import CostManager
@@ -18,34 +19,38 @@ class Taiyaki:
 
     def __init__(self, da_dic, word_dic_dir, trans_def):
         self.da = DoubleArray()
+        print('Loading dictionaries...')
         self._loadDictionary(da_dic, word_dic_dir, trans_def)
+        print('Loaded!')
 
-    def _loadDictionary(self, da_dic, word_dic_dir, trans_def, load_pickle=True):
+    def _loadDictionary(self, da_dic_file, vocab_dic_file, trans_cost_file):
         # double-array
-        if os.path.isfile(da_dic):
-            self.da.load(da_dic)
+        if os.path.isfile(da_dic_file):
+            self.da.load(da_dic_file)
         else:
             # TODO raise error
-            warnings.warn('{} not found'.format(da_dic))
+            warnings.warn('{} not found'.format(da_dic_file))
+            sys.exit()
 
         # vocabulary files
-        if os.path.exists('vocab.pkl') and load_pickle:
-            self._vocab = loadPickle('vocab.pkl')
+        if os.path.isfile(vocab_dic_file):
+            self._vocab = loadPickle(vocab_dic_file)
         else:
-            self._vocab = mdl.loadDictionary('./data/mecab-ipadic-2.7.0-20070801/')
-            savePickle(self._vocab, 'vocab.pkl')
+            # TODO raise error
+            warnings.warn('{} not found'.format(vocab_dic_file))
+            sys.exit()
 
         # transition matrix
-        if os.path.exists('trans_cost.pkl') and load_pickle:
-            self._trans_cost = loadPickle('trans_cost.pkl')
+        if os.path.isfile(trans_cost_file):
+            self._trans_cost = loadPickle(trans_cost_file)
         else:
-            self._trans_cost = mdl.loadMatrixDef('./data/mecab-ipadic-2.7.0-20070801/matrix.def')
-            savePickle(self._trans_cost, 'trans_cost.pkl')
+            # TODO raise error
+            warnings.warn('{} not found'.format(trans_cost_file))
+            sys.exit()
 
         self._cm = CostManager(self._vocab, self._trans_cost)
 
     def longestSearch(self, query):
-        print('Input:', query)
         begin = 0
         end = len(query)
         result = []
@@ -58,7 +63,7 @@ class Taiyaki:
             result.append(longest)
             begin += len(longest)
 
-        print('Result:', result)
+        return result
 
     def createLattice(self, query):
         lattice = Lattice(query)
