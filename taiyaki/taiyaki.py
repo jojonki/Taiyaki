@@ -4,8 +4,8 @@ import os
 import sys
 import warnings
 
-from double_array import DoubleArray
 from taiyaki.cost_manager import CostManager
+from taiyaki.double_array import DoubleArray
 from taiyaki.lattice import Lattice
 from utils.common import savePickle, loadPickle
 
@@ -63,6 +63,9 @@ class Taiyaki:
             begin += len(longest)
 
         return result
+
+    def commonPrefixSearch(self, query):
+        return self.da.commonPrefixSearch(query)
 
     def createLattice(self, query):
         lattice = Lattice(query)
