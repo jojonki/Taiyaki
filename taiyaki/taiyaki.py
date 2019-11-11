@@ -4,7 +4,7 @@ import os
 import sys
 import warnings
 
-from cost_manager import CostManager
+from taiyaki.cost_manager import CostManager
 from double_array import DoubleArray
 from lattice import Lattice
 import mecab_data_loader as mdl
