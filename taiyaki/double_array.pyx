@@ -50,7 +50,7 @@ cdef class DoubleArray:
             d_size /= 1024
         print('Double-Array size: {:.1f} {}'.format(d_size, unit))
         if verbose:
-            print('i:  {}'.format(', '.join([str(i) for i in range(1, N)])))
+            print('i: {}'.format(', '.join([str(i) for i in range(1, N)])))
             print('b: {}'.format(self._base[1:]))
             print('c: {}'.format(self._check[1:]))
 
@@ -66,7 +66,7 @@ cdef class DoubleArray:
         for c_ind, c in enumerate(word):
             next_node = self._base[crnt_node] + c
             if next_node < len(self._check) and self._check[next_node] == crnt_node:
-                # check ok. move to:', next_node
+                # check ok. move to next_node
                 crnt_node = next_node
                 crnt_char = c
             else:
@@ -110,22 +110,22 @@ cdef class DoubleArray:
         s = offset + c # move to next node
         return s
 
-    cdef getChildren(self, int s, int c):
+    cdef _getChildren(self, int s, int c):
         offset = self._base[s]
         # child_node_list = [ch_i for ch_i, ch_v in enumerate(self._check) if ch_v == s]
         # child_code_list = [ch_i - offset for ch_i in child_node_list] + [c]
 
         beg = max(0, min(s, offset) - 255)
         end = min(len(self._base), max(s, offset) + 255)
-        child_node_list2 = [ch_i + beg for ch_i, ch_v in enumerate(self._check[beg:end]) if ch_v == s]
-        child_code_list2 = [ch_i - offset for ch_i in child_node_list2] + [c]
-        return child_node_list2, child_code_list2
+        child_node_list = [ch_i + beg for ch_i, ch_v in enumerate(self._check[beg:end]) if ch_v == s]
+        child_code_list = [ch_i - offset for ch_i in child_node_list] + [c]
+        return child_node_list, child_code_list
 
-    cdef int resolveConflicts(self, int s, int c):
+    cdef int _resolveConflicts(self, int s, int c):
         """Resolves the conflict to add new code point.
         """
         # Firstly, gather children whose parent is node s.
-        child_node_list, child_code_list = self.getChildren(s, c)
+        child_node_list, child_code_list = self._getChildren(s, c)
 
         # Then, search an empty nodes for the children.
         for i in range(self._left, len(self._base)):
@@ -155,19 +155,19 @@ cdef class DoubleArray:
 
         # Expand the array for the nodes
         if not found_empty_check:
-            s = self.assign(s, c)
+            s = self._assign(s, c)
 
         return s
 
-    cdef int update(self, int s, int c):
-        if (self._base[s] + c < len(self._base)) and self._check[self._base[s] + c] == 0: # if check is correct
+    cdef int _update(self, int s, int c):
+        if (self._base[s] + c < len(self._base)) and self._check[self._base[s] + c] == 0: # if check is empty
             self._check[self._base[s] + c] = s
             s = self._base[s] + c # move to next node
         else: # node conflicted or need to expand the array
-            s = self.resolveConflicts(s, c)
+            s = self._resolveConflicts(s, c)
         return s
 
-    cdef int assign(self, int s, int c):
+    cdef int _assign(self, int s, int c):
         """Assigns a new node
         """
 
@@ -185,9 +185,9 @@ cdef class DoubleArray:
         for c in vocab:
             if self._base[s] == 0: # Not used based node
                 # Search an empty check node
-                s = self.assign(s, c)
+                s = self._assign(s, c)
             else: # Used base node
-                s = self.update(s, c)
+                s = self._update(s, c)
 
     cdef _build(self, bytes vocab):
         """Registes a vocab to the double-array.
@@ -237,10 +237,11 @@ cdef class DoubleArray:
             ret, final_node, final_char, char_ind = self.search(byte_char, start_node=final_node)
             # if ret and self._check[self._base[final_node] + T] == final_node:
             if ret and self._check[self._base[final_node] + 35] == final_node: # '#' -> 35
-                print('"{}" found in the dictionary'.format(input_str[:ind]))
+                # print('"{}" found in the dictionary'.format(input_str[:ind]))
                 cp_list.append(input_str[:ind])
             else:
-                print('"{}" NOT found in the dictionary'.format(input_str[:ind]))
+                # print('"{}" NOT found in the dictionary'.format(input_str[:ind]))
+                pass
 
         return cp_list
 

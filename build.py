@@ -10,8 +10,8 @@ import argparse
 import os
 import time
 
-from double_array import DoubleArray
-import mecab_data_loader as mdl
+from taiyaki.double_array import DoubleArray
+import taiyaki.mecab_data_loader as mdl
 from utils.common import savePickle
 
 

@@ -4,10 +4,9 @@ import os
 import sys
 import warnings
 
-from taiyaki.cost_manager import CostManager
 from double_array import DoubleArray
-from lattice import Lattice
-import mecab_data_loader as mdl
+from taiyaki.cost_manager import CostManager
+from taiyaki.lattice import Lattice
 from utils.common import savePickle, loadPickle
 
 
@@ -107,4 +106,5 @@ class Taiyaki:
         best_path = best_path[::-1] # reverse
 
         tokens = ([(b['_surface'], self._vocab[b['_surface']]['pos']) for b in best_path])
+
         return tokens
