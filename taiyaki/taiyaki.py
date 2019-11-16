@@ -8,6 +8,7 @@ from taiyaki.cost_manager import CostManager
 from taiyaki.double_array import DoubleArray
 from taiyaki.lattice import Lattice
 from utils.common import savePickle, loadPickle
+import taiyaki.mecab_data_loader as mdl
 
 
 INF = 1e10
@@ -76,12 +77,15 @@ class Taiyaki:
             cp_list = self.da.commonPrefixSearch(cps_q)
             # print('commonPrefixSearch("{}"): {}'.format(cps_q, cp_list))
             for cp in cp_list:
-                lattice.insert(idx, idx + len(cp), cp)
+                for props in self._vocab[cp]:
+                    props_dic = {key: val for key, val, in zip(mdl.DIC_FORM[1:], props)} # ignore the first element, 'surface'
+                    lattice.insert(idx, idx + len(cp), cp, props_dic)
 
         return lattice
 
     def tokenize(self, query):
         lattice = self.createLattice(query)
+        # lattice.pprint()
 
         # forward
         bos = lattice.end_nodes[0][0]
@@ -108,6 +112,6 @@ class Taiyaki:
             prev_node = prev_node['min_prev']
         best_path = best_path[::-1] # reverse
 
-        tokens = ([(b['_surface'], self._vocab[b['_surface']]['pos']) for b in best_path])
+        tokens = ([(b['_surface'], b['pos']) for b in best_path])
 
         return tokens

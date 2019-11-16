@@ -4,14 +4,18 @@ class Lattice(object):
         if sent:
             self.setSentence(sent)
 
-    def _newNode(self, begin, end, _surface_str=None):
-        return {
+    def _newNode(self, begin, end, _surface_str=None, props=None):
+        ret_node = {
             'surface': begin,
             'length': end - begin,
-            '_surface': _surface_str,
+            '_surface': _surface_str, # TODO redundant
             'min_cost': None,
-            'min_prev': None # previous node
+            'min_prev': None, # previous node
         }
+        for k, v in props.items():
+            ret_node[k] = v
+
+        return ret_node
 
     def setSentence(self, sent):
         self._sent = sent
@@ -19,13 +23,14 @@ class Lattice(object):
         self.begin_nodes = [[] for _ in range(len(sent) + 1)]
         self.end_nodes = [[] for _ in range(len(sent) + 1)]
 
-        bos_node = self._newNode(0, 0, '__BOS__')
+        # TODO remove hard coding
+        bos_node = self._newNode(0, 0, '__BOS__', {'lctx_id': 0, 'rctx_id': 0, 'cost': 0, 'pos': None, 'pron': None})
         self.end_nodes[0].append(bos_node)
-        eos_node = self._newNode(len(sent), 0, '__EOS__')
+        eos_node = self._newNode(len(sent), 0, '__EOS__', {'lctx_id': 1316, 'rctx_id': 1316, 'cost': 0, 'pos': None, 'pron': None})
         self.begin_nodes[len(sent)].append(eos_node)
 
-    def insert(self, begin, end, _surface_str=None):
-        node = self._newNode(begin, end, _surface_str)
+    def insert(self, begin, end, _surface_str=None, props=None):
+        node = self._newNode(begin, end, _surface_str, props)
         self.begin_nodes[begin].append(node)
         self.end_nodes[end].append(node)
         return node
@@ -37,9 +42,9 @@ class Lattice(object):
 
     def pprint(self):
         for i in range(len(self._sent) + 1):
-            print([n['_surface'] for n in self.end_nodes[i]], end='')
+            print(['{} ({})'.format(n['_surface'], n['pron']) for n in self.end_nodes[i]], end='')
             print(' ({}) '.format(i), end='')
-            print([n['_surface'] for n in self.begin_nodes[i]])
+            print(['{} ({})'.format(n['_surface'], n['pron']) for n in self.begin_nodes[i]])
 
     def plot(self):
         from graphviz import Digraph
