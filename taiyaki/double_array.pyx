@@ -16,7 +16,7 @@ cdef class DoubleArray:
     cdef public list _check
     cdef public int _left # Left edge index for index search
 
-    def __init__(self, data_size=20):
+    def __init__(self, data_size=256):
         self._data_size = data_size
         self._base = []
         self._check = []
@@ -232,16 +232,21 @@ cdef class DoubleArray:
         """
         cp_list = []
         final_node = 1
-        for ind, char in enumerate(input_str, 1):
-            byte_char = char.encode('utf-8')
+        for ind, chara in enumerate(input_str, 1):
+            byte_char = chara.encode('utf-8')
             ret, final_node, final_char, char_ind = self.search(byte_char, start_node=final_node)
             # if ret and self._check[self._base[final_node] + T] == final_node:
-            if ret and self._check[self._base[final_node] + 35] == final_node: # '#' -> 35
-                # print('"{}" found in the dictionary'.format(input_str[:ind]))
-                cp_list.append(input_str[:ind])
+            if ret:
+                if self._check[self._base[final_node] + 35] == final_node: # '#' -> 35
+                    print('"{}" found as a token!'.format(input_str[:ind]))
+                    cp_list.append(input_str[:ind])
+                else:
+                    # partialy found, let's continue searching
+                    print('"{}" found, but it\'s a partial token'.format(input_str[:ind]))
+                    pass
             else:
-                # print('"{}" NOT found in the dictionary'.format(input_str[:ind]))
-                pass
+                print('"{}" NOT found, abort searching'.format(input_str[:ind]))
+                break
 
         return cp_list
 
