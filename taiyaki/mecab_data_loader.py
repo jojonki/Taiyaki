@@ -48,6 +48,90 @@ def loadDictionary(dic_dir):
     return vocab
 
 
+def loadCharDef(fpath):
+    """Load char.def for unk tokens
+    Returns
+    -------
+    chart_cat_def: dictionary
+        {
+            'HIRAGANA': {
+                'invoke'     : 0,
+                'group'      : 0,
+                'length'     : 2,
+                'code_begin' : '0x3041',
+                'code_end'   : '0x309F'
+            },
+            'KATAKANA': {..},
+        }
+    """
+    char_cat_def = {}
+    cat_def_done = False
+    with codecs.open(fpath, 'r', 'euc_jp') as fin:
+        for l in fin:
+            l = l.strip()
+            if not cat_def_done:
+                if not l.startswith('#') and l:
+                    # DEFAULT	       0 1 0  # DEFAULT is a mandatory category!
+                    parse = l.split()
+                    assert len(parse) >= 4
+                    cat_name = parse[0]
+                    char_cat_def[cat_name] = {}
+                    #   - CATEGORY_NAME: Name of category. you have to define DEFAULT class.
+                    #   - INVOKE: 1/0:   always invoke unknown word processing, evan when the word can be found in the lexicon
+                    #   - GROUP:  1/0:   make a new word by grouping the same chracter category
+                    #   - LENGTH: n:     1 to n length new words are added
+                    char_cat_def[cat_name]['invoke'] = int(parse[1])
+                    char_cat_def[cat_name]['group'] = int(parse[1])
+                    char_cat_def[cat_name]['length'] = int(parse[3])
+                    continue
+
+                if not l and char_cat_def:
+                    cat_def_done = True
+                    continue
+            else:
+                if cat_def_done and not l.startswith('#') and l:
+                    l = l.split()
+                    # ['0x5146', 'KANJINUMERIC', 'KANJI']
+                    # ['0xFF10..0xFF19', 'NUMERIC']
+                    code_point = [l[0], l[0]]
+                    if '..' in l[0]:
+                        code_point = l[0].split('..', 1)
+                    cat_name = l[1]
+                    if 'code_points' not in char_cat_def[cat_name]:
+                        char_cat_def[cat_name]['code_points'] = []
+                    char_cat_def[cat_name]['code_points'].append(code_point)
+
+    return char_cat_def
+
+
+def analyzeCharCategory(char_cat_def, char):
+    """Analyze a given character category by checking code points
+    Parameters
+    ----------
+    char_cat_def: dictionary
+        Dcitionary which is obtained by loadCharDef function.
+    char: string
+        A character to analyze
+
+    Returns
+    -------
+    cat_name: string
+       Category name
+    """
+    assert len(char) == 1
+    cp = ord(char)
+    for cat_name, params in char_cat_def.items():
+        if 'code_points' in params:
+            for cand_cp in params['code_points']:
+                cp_beg, cp_end = cand_cp
+                if cp >= int(cp_beg, 16) and cp <= int(cp_end, 16):
+                    return cat_name
+
+
 if __name__ == '__main__':
-    vocab = loadDictionary('./data/mecab-ipadic-2.7.0-20070801/')
-    trans_cost = loadMatrixDef('./data/mecab-ipadic-2.7.0-20070801/matrix.def')
+    # vocab = loadDictionary('./data/mecab-ipadic-2.7.0-20070801/')
+    # trans_cost = loadMatrixDef('./data/mecab-ipadic-2.7.0-20070801/matrix.def')
+    char_cat_def = loadCharDef('./data/mecab-ipadic-2.7.0-20070801/char.def')
+    # print(char_cat_def)
+    for c in ['a', 'お', '1', '化', 'ア']:
+        print(c, analyzeCharCategory(char_cat_def, c))
