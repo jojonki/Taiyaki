@@ -24,12 +24,16 @@ def main():
 
     # get all the csv files in that directory (assuming they have the extension .csv)
     csv_files = glob.glob(os.path.join(args.ipadic_dir, '*.csv'))
+    words = []
+    for c in csv_files:
+        print('Load', c)
+        with codecs.open(c, 'r', 'euc_jp') as fin:
+            for l in fin:
+                words.append(l.split(',')[0])
+    words = sorted(list(set(words)))
+    print('# of words:', len(words))
     with open(args.out, 'w') as fout:
-        for c in csv_files:
-            print('Load', c)
-            with codecs.open(c, 'r', 'euc_jp') as fin:
-                for l in fin:
-                    fout.write('{}\n'.format(l.split(',')[0]))
+        fout.write('\n'.join(words))
 
     print('Output:', args.out)
     print('Process time: {:.1f}s'.format(time.time() - begin_time))
