@@ -8,7 +8,7 @@ import time
 
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
-from double_array import DoubleArray
+from taiyaki.double_array import DoubleArray
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--dict', required=True, type=str, metavar='PATH', help='double-array dictionary')
-    parser.add_argument('--q', type=str, help='query of commonPrefixSearch. Use commna (,) to specify multi queries.')
+    parser.add_argument('--q', '-q', required=True, type=str, help='query of commonPrefixSearch. Use commna (,) to specify multi queries.')
     args = parser.parse_args()
 
     da = DoubleArray()
