@@ -170,13 +170,23 @@ cdef class DoubleArray:
     cdef int _assign(self, int s, int c):
         """Assigns a new node
         """
+        if self._data_size <= self._base[s]+c+1:
+            self._expand((self._base[s] + c + 1) - self._data_size + 256)
 
-        # TODO I expand the array to avoid searching an empty check node.
-        self._expand(1)
-        check_idx = len(self._base) - 1
+        check_idx = None
+        for i in range(self._base[s]+c+1, self._data_size):
+            if self._check[i] == 0:
+                self._base[s] = i - c
+                self._check[i] = s
+                check_idx = i
+                break
 
-        self._base[s] = check_idx - c
-        self._check[check_idx] = s
+        if check_idx is None: # no empty cehck, need to expand the array
+            self._expand(1)
+            check_idx = len(self._base) - 1
+            self._base[s] = check_idx - c
+            self._check[check_idx] = s
+
         return check_idx # move to next node
 
     cdef _registerVocab(self, bytes vocab, int s):
@@ -230,6 +240,7 @@ cdef class DoubleArray:
             Return:
                 prefix_list: A list of words contains input_str as prefix
         """
+        # print('CPF:', input_str)
         cp_list = []
         final_node = 1
         for ind, chara in enumerate(input_str, 1):
@@ -238,14 +249,13 @@ cdef class DoubleArray:
             # if ret and self._check[self._base[final_node] + T] == final_node:
             if ret:
                 if self._check[self._base[final_node] + 35] == final_node: # '#' -> 35
-                    print('"{}" found as a token!'.format(input_str[:ind]))
+                    # print('"{}" found as a token!'.format(input_str[:ind]))
                     cp_list.append(input_str[:ind])
                 else:
-                    # partialy found, let's continue searching
-                    print('"{}" found, but it\'s a partial token'.format(input_str[:ind]))
+                    # print('"{}" found, but it\'s a partial token'.format(input_str[:ind]))
                     pass
             else:
-                print('"{}" NOT found, abort searching'.format(input_str[:ind]))
+                # print('"{}" NOT found, abort searching'.format(input_str[:ind]))
                 break
 
         return cp_list
