@@ -4,13 +4,14 @@ class Lattice(object):
         if sent:
             self.setSentence(sent)
 
-    def _newNode(self, begin, end, _surface_str=None, props=None):
+    def _newNode(self, begin, end, _surface_str=None, props=None, unk=None):
         ret_node = {
             'surface': begin,
             'length': end - begin,
             '_surface': _surface_str, # TODO redundant
             'min_cost': None,
             'min_prev': None, # previous node
+            'unk': unk
         }
         for k, v in props.items():
             ret_node[k] = v
@@ -29,8 +30,8 @@ class Lattice(object):
         eos_node = self._newNode(len(sent), 0, '__EOS__', {'lctx_id': 1316, 'rctx_id': 1316, 'cost': 0, 'pos': None, 'pron': None})
         self.begin_nodes[len(sent)].append(eos_node)
 
-    def insert(self, begin, end, _surface_str=None, props=None):
-        node = self._newNode(begin, end, _surface_str, props)
+    def insert(self, begin, end, _surface_str=None, props=None, unk=None):
+        node = self._newNode(begin, end, _surface_str, props, unk)
         self.begin_nodes[begin].append(node)
         self.end_nodes[end].append(node)
         return node

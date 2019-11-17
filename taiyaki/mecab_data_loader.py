@@ -23,6 +23,7 @@ def loadMatrixDef(fpath):
 
 def loadDictionary(dic_dir):
     csv_files = glob.glob(os.path.join(dic_dir, '*.csv'))
+    csv_files += [os.path.join(dic_dir, 'unk.def')] # add unk settings
     vocab = {
                 '__BOS__': [0, 0, 0, None, None, None, None, None, None, None, None, None, None],
                 '__EOS__': [1316, 1316, 0, None, None, None, None, None, None, None, None, None, None]
@@ -34,10 +35,8 @@ def loadDictionary(dic_dir):
                 # ex)
                 # 文明,1285,1285,5336,名詞,一般,*,*,*,*,文明,ブンメイ,ブンメイ
                 d = l.strip().split(',')
-                if d[0] not in vocab: # TODO should support duplicate surfaces (e.g., 生野(イクノ, イケノ))
+                if d[0] not in vocab:
                     vocab[d[0]] = []
-                if d[0] == '生野':
-                    print(d)
 
                 d[H2I['lctx_id']] = int(d[H2I['lctx_id']])
                 d[H2I['rctx_id']] = int(d[H2I['rctx_id']])
@@ -131,8 +130,8 @@ def getUnkWordFromSentence(query, char_cat_def):
     """Get unknown tokens by seeing char.def
     Returns
     -------
-    unk_word: string
-        Unknwon word
+    (unk_word, unk_cat_name): tuple
+        Tuple of (unknown_word: string, unk_category_name: string)
     """
     unk_word = None
     unk_cat_name = None
@@ -140,8 +139,7 @@ def getUnkWordFromSentence(query, char_cat_def):
     unk_len = 0
 
     unk_cat_name = analyzeCharCategory(query[0], char_cat_def)
-    if char_cat_def[unk_cat_name]['invoke'] == 0: # check wheather unknown grouping
-        return unk_word
+    # if char_cat_def[unk_cat_name]['invoke'] == 1: # TODO if invoke==1, always invoke unk word processing
     unk_word = query[0]
     unk_same_grouping = char_cat_def[unk_cat_name]['group']
     unk_len = char_cat_def[unk_cat_name]['length']
@@ -156,7 +154,13 @@ def getUnkWordFromSentence(query, char_cat_def):
             break
         unk_word += char
 
-    return unk_word
+    return (unk_word, unk_cat_name)
+
+
+def loadUnkDef(fpath):
+    with codecs.open(fpath, 'r', 'euc_jp') as fin:
+        for l in fin:
+            l = l.strip()
 
 
 if __name__ == '__main__':

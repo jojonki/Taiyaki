@@ -16,7 +16,10 @@ def run(taiyaki, query):
     print('Common prefixes: {}'.format(cp_list))
 
     tokens = taiyaki.tokenize(query)
-    print('Tokenized tokens (min cost):', tokens)
+    print('Tokenized tokens (min cost):')
+    print('{}\t{}\t{}\t{}'.format('表層系', '品詞', '発音', '未知語'))
+    for t in tokens:
+        print('{}\t{}\t{}\t{}'.format(t['_surface'], t['pos'], t['pron'], t['unk']))
 
     tokens = taiyaki.longestSearch(query)
     print('Tokenized tokens (longest match):', tokens)
@@ -39,12 +42,17 @@ def main():
                         metavar='PATH',
                         default='./data/trans_cost.dict',
                         help='token transition cost dictionary')
+    parser.add_argument('--char_cat_def_file',
+                        type=str,
+                        metavar='PATH',
+                        default='./data/char_cat_def.dict',
+                        help='char.def dictionary for unk words')
     parser.add_argument('-q', '--query',
                         type=str,
                         help='input query')
     args = parser.parse_args()
 
-    taiyaki = Taiyaki(args.da_dic_file, args.vocab_dic_file, args.trans_cost_file)
+    taiyaki = Taiyaki(args.da_dic_file, args.vocab_dic_file, args.trans_cost_file, args.char_cat_def_file)
 
     query = args.query
     if query:

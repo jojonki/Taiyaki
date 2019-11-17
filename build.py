@@ -41,6 +41,7 @@ def main():
     parser.add_argument('--ipadic_dir', type=str, metavar='PATH', default='./data/mecab-ipadic-2.7.0-20070801/', help='')
     parser.add_argument('--vocab_dic_file', type=str, metavar='PATH', default='./data/vocab.dict', help='')
     parser.add_argument('--trans_cost_file', type=str, metavar='PATH', default='./data/trans_cost.dict', help='')
+    parser.add_argument('--char_cat_def_file', type=str, metavar='PATH', default='./data/char_cat_def.dict', help='')
     args = parser.parse_args()
 
     print('-------------------------------------------------------')
@@ -57,6 +58,11 @@ def main():
     print('Build your transition cost dictionary!')
     trans_cost = mdl.loadMatrixDef(os.path.join(args.ipadic_dir, 'matrix.def'))
     savePickle(trans_cost, args.trans_cost_file)
+
+    print('-------------------------------------------------------')
+    print('Build your char.def dictionary!')
+    char_cat_def = mdl.loadCharDef(os.path.join(args.ipadic_dir, 'char.def'))
+    savePickle(char_cat_def, args.char_cat_def_file)
 
 
 if __name__ == '__main__':

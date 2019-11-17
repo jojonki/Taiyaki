@@ -17,13 +17,13 @@ INF = 1e10
 class Taiyaki:
     """Taiyaki class implementation"""
 
-    def __init__(self, da_dic, word_dic_dir, trans_def):
+    def __init__(self, da_dic, word_dic_dir, trans_def, char_def):
         self.da = DoubleArray()
         print('Loading dictionaries...')
-        self._loadDictionary(da_dic, word_dic_dir, trans_def)
+        self._loadDictionary(da_dic, word_dic_dir, trans_def, char_def)
         print('Loaded!')
 
-    def _loadDictionary(self, da_dic_file, vocab_dic_file, trans_cost_file):
+    def _loadDictionary(self, da_dic_file, vocab_dic_file, trans_cost_file, char_cat_def_file):
         # double-array
         if os.path.isfile(da_dic_file):
             self.da.load(da_dic_file)
@@ -46,6 +46,14 @@ class Taiyaki:
         else:
             # TODO raise error
             warnings.warn('{} not found'.format(trans_cost_file))
+            sys.exit()
+
+        # char.def
+        if os.path.isfile(char_cat_def_file):
+            self._char_cat_def = loadPickle(char_cat_def_file)
+        else:
+            # TODO raise error
+            warnings.warn('{} not found'.format(char_cat_def_file))
             sys.exit()
 
         self._cm = CostManager(self._vocab, self._trans_cost)
@@ -75,11 +83,18 @@ class Taiyaki:
             cps_q = query[idx:]
             # print('=====Search {}======'.format(cps_q))
             cp_list = self.da.commonPrefixSearch(cps_q)
-            # print('commonPrefixSearch("{}"): {}'.format(cps_q, cp_list))
-            for cp in cp_list:
-                for props in self._vocab[cp]:
+            if len(cp_list) == 0: # unk word
+                unk_word, unk_cat_name = mdl.getUnkWordFromSentence(cps_q, self._char_cat_def)
+                for props in self._vocab[unk_cat_name]:
+                    # add dummy fields since unk.def does not have ruby and pron fields
+                    props += ['*'] * (len(mdl.DIC_FORM) - len(props))
                     props_dic = {key: val for key, val, in zip(mdl.DIC_FORM[1:], props)} # ignore the first element, 'surface'
-                    lattice.insert(idx, idx + len(cp), cp, props_dic)
+                    lattice.insert(idx, idx + len(unk_word), unk_word, props_dic, unk=True)
+            else:
+                for cp in cp_list:
+                    for props in self._vocab[cp]:
+                        props_dic = {key: val for key, val, in zip(mdl.DIC_FORM[1:], props)} # ignore the first element, 'surface'
+                        lattice.insert(idx, idx + len(cp), cp, props_dic, unk=False)
 
         return lattice
 
@@ -112,6 +127,6 @@ class Taiyaki:
             prev_node = prev_node['min_prev']
         best_path = best_path[::-1] # reverse
 
-        tokens = ([(b['_surface'], b['pos']) for b in best_path])
+        # tokens = ([(b['_surface'], b['pos'], 'unk={}'.format(b['unk'])) for b in best_path])
 
-        return tokens
+        return best_path
