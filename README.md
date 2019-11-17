@@ -39,3 +39,4 @@ Tokenized tokens (longest match): ['吾輩', 'は', '猫', 'で', 'ある']
 - [ ] integrate dictionaries
 - [ ] regularization
 - [ ] always invoke category processing
+- [ ] (bug) Unknown words found in double_array and will cause KeyError. 「はい，おっぱっぴー」
