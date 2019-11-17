@@ -104,7 +104,7 @@ def loadCharDef(fpath):
     return char_cat_def
 
 
-def analyzeCharCategory(char_cat_def, char):
+def analyzeCharCategory(char, char_cat_def):
     """Analyze a given character category by checking code points
     Parameters
     ----------
@@ -127,6 +127,37 @@ def analyzeCharCategory(char_cat_def, char):
                 if cp >= int(cp_beg, 16) and cp <= int(cp_end, 16):
                     return cat_name
 
+def getUnkWordFromSentence(query, char_cat_def):
+    """Get unknown tokens by seeing char.def
+    Returns
+    -------
+    unk_word: string
+        Unknwon word
+    """
+    unk_word = None
+    unk_cat_name = None
+    unk_same_grouping = None
+    unk_len = 0
+
+    unk_cat_name = analyzeCharCategory(query[0], char_cat_def)
+    if char_cat_def[unk_cat_name]['invoke'] == 0: # check wheather unknown grouping
+        return unk_word
+    unk_word = query[0]
+    unk_same_grouping = char_cat_def[unk_cat_name]['group']
+    unk_len = char_cat_def[unk_cat_name]['length']
+
+    # concat a unk word
+    for char in query[1:]:
+        if len(unk_word) >= unk_len:
+            break
+
+        cat_name = analyzeCharCategory(char, char_cat_def)
+        if cat_name != unk_cat_name and unk_same_grouping is False:
+            break
+        unk_word += char
+
+    return unk_word
+
 
 if __name__ == '__main__':
     # vocab = loadDictionary('./data/mecab-ipadic-2.7.0-20070801/')
@@ -134,4 +165,6 @@ if __name__ == '__main__':
     char_cat_def = loadCharDef('./data/mecab-ipadic-2.7.0-20070801/char.def')
     # print(char_cat_def)
     for c in ['a', 'お', '1', '化', 'ア']:
-        print(c, analyzeCharCategory(char_cat_def, c))
+        print('CAT:', c, analyzeCharCategory(c, char_cat_def))
+    for t in ['テイラ', '五反田', 'ガ画', 'おはよう', '1234']:
+        print('UNK:', t, getUnkWordFromSentence(t, char_cat_def))
