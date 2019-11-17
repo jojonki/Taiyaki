@@ -9,7 +9,7 @@ class CostManager:
         self._trans_cost = trans_cost
 
     def getEmissionCost(self, node):
-        if node['_surface'] in self._vocab:
+        if node['surface'] in self._vocab:
             return node['cost']
         else:
             # TODO handle correctly

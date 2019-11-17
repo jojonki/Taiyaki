@@ -4,11 +4,11 @@ class Lattice(object):
         if sent:
             self.setSentence(sent)
 
-    def _newNode(self, begin, end, _surface_str=None, props=None, unk=None):
+    def _newNode(self, begin, end, surface=None, props=None, unk=None):
         ret_node = {
-            'surface': begin,
+            'pos': begin,
             'length': end - begin,
-            '_surface': _surface_str, # TODO redundant
+            'surface': surface,
             'min_cost': None,
             'min_prev': None, # previous node
             'unk': unk
@@ -30,8 +30,8 @@ class Lattice(object):
         eos_node = self._newNode(len(sent), 0, '__EOS__', {'lctx_id': 1316, 'rctx_id': 1316, 'cost': 0, 'pos': None, 'pron': None})
         self.begin_nodes[len(sent)].append(eos_node)
 
-    def insert(self, begin, end, _surface_str=None, props=None, unk=None):
-        node = self._newNode(begin, end, _surface_str, props, unk)
+    def insert(self, begin, end, surface=None, props=None, unk=None):
+        node = self._newNode(begin, end, surface, props, unk)
         self.begin_nodes[begin].append(node)
         self.end_nodes[end].append(node)
         return node
@@ -43,9 +43,9 @@ class Lattice(object):
 
     def pprint(self):
         for i in range(len(self._sent) + 1):
-            print(['{} ({})'.format(n['_surface'], n['pron']) for n in self.end_nodes[i]], end='')
+            print(['{} ({})'.format(n['surface'], n['pron']) for n in self.end_nodes[i]], end='')
             print(' ({}) '.format(i), end='')
-            print(['{} ({})'.format(n['_surface'], n['pron']) for n in self.begin_nodes[i]])
+            print(['{} ({})'.format(n['surface'], n['pron']) for n in self.begin_nodes[i]])
 
     def plot(self):
         from graphviz import Digraph
@@ -54,17 +54,17 @@ class Lattice(object):
         added_nodes = []
         for i in range(len(self._sent) + 1):
             for ct, n in enumerate(self.end_nodes[i]):
-                if n['_surface'] not in added_nodes:
-                    g.node(n['_surface'], n['_surface'])
-                    added_nodes.append(n['_surface'])
+                if n['surface'] not in added_nodes:
+                    g.node(n['surface'], n['surface'])
+                    added_nodes.append(n['surface'])
             for ct, n in enumerate(self.begin_nodes[i]):
-                if n['_surface'] not in added_nodes:
-                    g.node(n['_surface'], n['_surface'])
-                    added_nodes.append(n['_surface'])
+                if n['surface'] not in added_nodes:
+                    g.node(n['surface'], n['surface'])
+                    added_nodes.append(n['surface'])
 
             for en in self.end_nodes[i]:
                 for bn in self.begin_nodes[i]:
-                    g.edge(en['_surface'], bn['_surface'])
+                    g.edge(en['surface'], bn['surface'])
 
         print('Save this lattice image as png')
         g.render('lattice')

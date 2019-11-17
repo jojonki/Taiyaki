@@ -127,6 +127,6 @@ class Taiyaki:
             prev_node = prev_node['min_prev']
         best_path = best_path[::-1] # reverse
 
-        # tokens = ([(b['_surface'], b['pos'], 'unk={}'.format(b['unk'])) for b in best_path])
+        # tokens = ([(b['surface'], b['pos'], 'unk={}'.format(b['unk'])) for b in best_path])
 
         return best_path

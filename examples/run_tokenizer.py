@@ -19,7 +19,7 @@ def run(taiyaki, query):
     print('Tokenized tokens (min cost):')
     print('{}\t{}\t{}\t{}'.format('表層系', '品詞', '発音', '未知語'))
     for t in tokens:
-        print('{}\t{}\t{}\t{}'.format(t['_surface'], t['pos'], t['pron'], t['unk']))
+        print('{}\t{}\t{}\t{}'.format(t['surface'], t['pos'], t['pron'], t['unk']))
 
     tokens = taiyaki.longestSearch(query)
     print('Tokenized tokens (longest match):', tokens)

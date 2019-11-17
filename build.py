@@ -26,7 +26,6 @@ def build_double_array(da, word_list_file, da_dic_file):
     print('Building vocabuary...')
     da.build(word_list)
     print('Building time of your double-array: {:.1f}s'.format(time.time() - build_begin_time))
-    # dic_file = './models/{}.dict'.format(vocab_file.split('/')[-1])
     print('You have built the double-array dictionary!: {}'.format(da_dic_file))
     da.save(da_dic_file)
     da.report()
