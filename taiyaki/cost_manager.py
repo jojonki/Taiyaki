@@ -9,16 +9,17 @@ class CostManager:
         self._trans_cost = trans_cost
 
     def getEmissionCost(self, node):
-        if node['surface'] in self._vocab:
-            return node['cost']
-        else:
-            # TODO handle correctly
-            return 10000
+        assert 'cost' in node
+        return node['cost']
 
     def getTransitionCost(self, lnode, rnode):
+        if rnode['surface'] == '__EOS__':
+            return 0
+
         try:
             key = '{}:{}'.format(lnode['lctx_id'], rnode['rctx_id'])
             return self._trans_cost[key]
         except KeyError:
             # TODO handle correctly
+            print('Unknown transition:', lnode['surface'], rnode['surface'])
             return 10000
