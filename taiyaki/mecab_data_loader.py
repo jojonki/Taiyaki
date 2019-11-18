@@ -126,7 +126,7 @@ def analyzeCharCategory(char, char_cat_def):
                 if cp >= int(cp_beg, 16) and cp <= int(cp_end, 16):
                     return cat_name
 
-def getUnkWordFromSentence(query, char_cat_def):
+def getUnkWordFromSentence(query, char_cat_def, unk_word=True):
     """Get unknown tokens by seeing char.def
     Returns
     -------
@@ -139,7 +139,10 @@ def getUnkWordFromSentence(query, char_cat_def):
     unk_len = 0
 
     unk_cat_name = analyzeCharCategory(query[0], char_cat_def)
-    # if char_cat_def[unk_cat_name]['invoke'] == 1: # TODO if invoke==1, always invoke unk word processing
+    unk_invoke = char_cat_def[unk_cat_name]['invoke']
+    if unk_invoke == 0 and unk_word is False:
+        return (None, None)
+
     unk_word = query[0]
     unk_same_grouping = char_cat_def[unk_cat_name]['group']
     unk_len = char_cat_def[unk_cat_name]['length']

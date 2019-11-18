@@ -96,6 +96,16 @@ class Taiyaki:
                         props_dic = {key: val for key, val, in zip(mdl.DIC_FORM[1:], props)} # ignore the first element, 'surface'
                         lattice.insert(idx, idx + len(cp), cp, props_dic, unk=False)
 
+                    # unk_word processing for invoke==1
+                    # TODO redundant coding
+                    unk_word, unk_cat_name = mdl.getUnkWordFromSentence(cp, self._char_cat_def, unk_word=False)
+                    if unk_word and unk_cat_name:
+                        for props in self._vocab[unk_cat_name]:
+                            # add dummy fields since unk.def does not have ruby and pron fields
+                            props += ['*'] * (len(mdl.DIC_FORM) - len(props))
+                            props_dic = {key: val for key, val, in zip(mdl.DIC_FORM[1:], props)} # ignore the first element, 'surface'
+                            lattice.insert(idx, idx + len(unk_word), unk_word, props_dic, unk=True)
+
         return lattice
 
     def tokenize(self, query):
