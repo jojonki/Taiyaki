@@ -143,6 +143,10 @@ def getUnkWordFromSentence(query, char_cat_def):
     unk_word = query[0]
     unk_same_grouping = char_cat_def[unk_cat_name]['group']
     unk_len = char_cat_def[unk_cat_name]['length']
+    if unk_same_grouping == 1 and unk_len == 0:
+        # unk_len == 0 is a special case which does not the length of unknown word
+        # so i set the maximum length for unk_len
+        unk_len = len(query)
 
     # concat a unk word
     for char in query[1:]:
@@ -150,7 +154,7 @@ def getUnkWordFromSentence(query, char_cat_def):
             break
 
         cat_name = analyzeCharCategory(char, char_cat_def)
-        if cat_name != unk_cat_name and unk_same_grouping is False:
+        if cat_name != unk_cat_name and unk_same_grouping == 1:
             break
         unk_word += char
 
