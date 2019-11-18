@@ -32,11 +32,12 @@ Tokenized tokens (longest match): ['吾輩', 'は', '猫', 'で', 'ある']
 
 
 ## TODOs
-- [ ] refactoring an lattice node style
+- [x] refactoring an lattice node style
 - [ ] remove TODOs
-- [ ] [未知語処理](https://github.com/taku910/mecab/blob/32041d9504d11683ef80a6556173ff43f79d1268/mecab-ipadic/unk.def)
+- [x] [未知語処理](https://github.com/taku910/mecab/blob/32041d9504d11683ef80a6556173ff43f79d1268/mecab-ipadic/unk.def)
 - [ ] [学習済みCRFを使った新語追加](https://taku910.github.io/mecab/dic.html)
 - [ ] integrate dictionaries
 - [ ] regularization
 - [ ] always invoke category processing
-- [ ] (bug) Unknown words found in double_array and will cause KeyError. 「はい，おっぱっぴー」
+- [x] (bug) Unknown words found in double_array and will cause KeyError. 「はい，おっぱっぴー」
+- [ ] add test cases
