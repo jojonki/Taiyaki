@@ -1,6 +1,9 @@
 # Taiyaki
 日本語形態素解析エンジン．
 
+<img width=400 src="https://user-images.githubusercontent.com/166852/70145223-efcf9480-16e2-11ea-9708-b1e9d44005b1.png" />
+
+
 ## セットアップ
 
 1. [mecab-ipadic-2.7.0-20070801.tar.gz](https://ja.osdn.net/projects/sfnet_mecab/downloads/mecab-ipadic/2.7.0-20070801/mecab-ipadic-2.7.0-20070801.tar.gz/)をダウンロードして`./data/`において解凍．
